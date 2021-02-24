@@ -6,9 +6,6 @@ import { db, auth} from './firebase';
 import { makeStyles } from '@material-ui/core/styles';
 import Modal from '@material-ui/core/Modal';
 import { Button,Input }  from '@material-ui/core';
-import ImageUpload from './ImageUpload';
-import InstagramEmbed from 'react-instagram-embed';
-
 function getModalStyle() {
   const top = 50;
   const left = 50;
@@ -58,7 +55,7 @@ function App() {
 
 useEffect(() => {
 
-  db.collection('posts').orderBy('timestamp','desc').onSnapshot(snapshot =>{
+  db.collection('posts').onSnapshot(snapshot =>{
     setPosts(snapshot.docs.map(doc=>({
       id: doc.id,
       post: doc.data()
@@ -70,7 +67,7 @@ const Singup=(event)=>{
   event.preventDefault();
   auth.createUserWithEmailAndPassword(email,password)
   .then((authUser)=>{
-     return authUser.user.updateProfile({
+    return authUser.user.updateProfile({
       displayName:username
     })
   })
@@ -79,7 +76,7 @@ const Singup=(event)=>{
 const SignIn=(event)=>{
   event.preventDefault();
   auth
-  .signInWithEmailAndPassword(email,password)
+  .signInWithEmailAndPassword(email.password)
   .catch((error)=> alert(error.message))
   setOpenSignIn(false);
 }
@@ -148,7 +145,7 @@ const SignIn=(event)=>{
         value={password}
         onChange={(e)=>setPassword(e.target.value)}
         />
-            <Button onClick={SignIn}>login</Button>
+            <Button onClick={Singup}>login</Button>
         </form>
       </center>
       </div>
@@ -160,7 +157,8 @@ const SignIn=(event)=>{
         src="https://www.instagram.com/static/images/web/mobile_nav_type_logo.png/735145cfe0a4.png"
         alt=""
         />
-         {
+        </div>
+        {
           user ?(
             <Button onClick={()=>auth.signOut()}>logout</Button>
           ):(
@@ -171,37 +169,12 @@ const SignIn=(event)=>{
            
           )
           } 
-        </div>
-         <div className="app__posts">
-           <div className="app__postsLeft">
-             {
+         <h1>hello !!</h1>
+         {
             posts.map(post=>(
-            <Post postId={post.id} user={user} username={post.post.username} caption={post.post.caption} imageUrl={post.post.imageUrl} />
+            <Post username={post.username} caption={post.caption} imageUrl={post.imageUrl} />
          ))
-         } 
-           </div>
-          <div className="app__postsRight">
-             <InstagramEmbed
-          url ='https://www.instagram.com/p/B_uf9dmAGPw/'
-          clientAccessToken='123|456'
-          maxWidth={320}
-          hideCaption={false}
-          containerTagName='div'
-           protocol=''
-           injectScript
-            onLoading={() => {}}
-            onSuccess={() => {}}
-            onAfterRender={() => {}}
-            onFailure={() => {}}
-          />
-          </div>
-        
-         </div> 
-          {user?.displayName ?(
-      <ImageUpload  username={user.displayName}/>
-      ):(
-        <h3>Sorry you need to login to upload</h3>
-      )}
+         }
       
         
      {/* header */}
